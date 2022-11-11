@@ -71,6 +71,8 @@ groupSynd = cell(1,2);
 groupSynd{1} = delta(sleepCls == 0);
 groupSynd{2} = delta(sleepCls == 1);
 
+deltaWake.values = groupSynd{1};
+deltaSleep.values = groupSynd{2};
 
 deltaWake.Median = median(groupSynd{1});
 deltaSleep.Median = median(groupSynd{2});
@@ -78,10 +80,12 @@ deltaSleep.Median = median(groupSynd{2});
 deltaWake.Mean = mean(groupSynd{1});
 deltaSleep.Mean = mean(groupSynd{2});
 
-deltaWake.Std = std(groupSynd{1});
-deltaSleep.Std = std(groupSynd{2});
-
 deltaWake.Num = length(groupSynd{1});
 deltaSleep.Num = length(groupSynd{2});
+
+deltaWake.SEM = std(groupSynd{1})/deltaWake.Num;
+deltaSleep.SEM = std(groupSynd{2})/deltaSleep.Num;
+
+
 
 end
