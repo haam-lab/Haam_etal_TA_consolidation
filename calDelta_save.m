@@ -33,6 +33,13 @@ nameV = regexp(fileName,'(.*).csv','tokens');    % remove .csv
 inFilePath = [pathName fileName];
 sleepCls = readmatrix(inFilePath); % input file name
 
+%% if the sleep state was labeled 2 (e.g. ML algorithm) instead of 1 (immobility), conver to 1
+for ii =1:length(sleepCls)
+    if sleepCls(ii) ==2
+        sleepCls(ii)=1;
+    end
+end
+
 %% Parameters for frequency domain analysis
 params.tapers = [3 5];      
 params.Fs = fs;   
