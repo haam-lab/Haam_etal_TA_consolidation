@@ -3,6 +3,14 @@ function [p_val,testType, stats, graph1] = compareTwoGroups(group1,group2, paire
 % test needs to be used. Perform a relevant statistical test.
 % Created by Juhee Haam
 
+% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+% EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+% OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+% IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+% DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+% ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+% DEALINGS IN THE SOFTWARE.
+
 %   Input arguments:
 % - group 1 and group 2: two samples that will be compared (matrices)
 % - paired: paired for 0; non-paired for 1
