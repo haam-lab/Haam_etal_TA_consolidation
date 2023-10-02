@@ -1,4 +1,4 @@
-% Calculate motion index (similar to Ethovision activity) from video data
+% Calculate activity index from video data
 % Created by Juhee Haam
 
 % THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
@@ -31,7 +31,7 @@ blk_size = 1000; % number of frames that are read together
 
 %% directories
 user= getenv('username');
-% startFolder = ['C:\Users\' user];
+startFolder = ['C:\Users\' user];
 
 projectFolder = uigetdir(startFolder,'Select a project folder (Parent directory Where Input and Ouput folders Are Stored)');
 motion_index_folder = [projectFolder '\activity_index\'];
