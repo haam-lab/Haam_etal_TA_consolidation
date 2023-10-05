@@ -57,10 +57,10 @@ fs = 1/(import(2,1) - import(1,1));
 %% Features 1-4 extraction
 actBin.size = floor(size(activity,1)/fs/binSize);
 actBin.data = cell(actBin.size,1);
-actBin.mean = zeros(1, actBin.size);
-actBin.std = zeros(1, actBin.size);
-actBin.median = zeros(1, actBin.size);
-actBin.base = zeros(1, actBin.size);
+actBin.mean = zeros(actBin.size, 1);
+actBin.std = zeros(actBin.size, 1);
+actBin.median = zeros(actBin.size, 1);
+actBin.base = zeros(actBin.size, 1);
 
 % data put in each bin
 for ii = 1:actBin.size
@@ -122,7 +122,10 @@ for ii = 1:timeLength
 end
 
 %% Plot activity data and all features
-feature_data = [actBin.mean', actBin.std', actBin.median', actBin.base', power0_1, power1_4, power6_10]; % each column contains each feature
+len_trim = min(length(actBin.mean), length(power0_1));
+actBin.mean = actBin.mean(1:len_trim, :); actBin.std = actBin.std(1:len_trim, :); actBin.median = actBin.median(1:len_trim, :); actBin.base = actBin.base(1:len_trim, :);
+power0_1 = power0_1(1:len_trim, :); power1_4 = power1_4(1:len_trim, :); power6_10 = power6_10(1:len_trim, :);
+feature_data = [actBin.mean, actBin.std, actBin.median, actBin.base, power0_1, power1_4, power6_10]; % each column contains each feature
 label_data = {'Mean', 'Std', ' Median', 'Base', '0-1 Hz power', '1-4 Hz power', '6-10 Hz power' };
 timestamp = 1/2/fs:1/fs:1/2/fs+(length(activity)-1)*1/fs;
 timeBin = binSize:binSize:actBin.size*binSize;
