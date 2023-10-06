@@ -27,7 +27,6 @@ activity_thr = 5 ; % changes in pixel value
 sigma= 1; % sigma for gaussian filtering
 fs = 25; % video sampling frequency
 down_factor = 1; % image down sample factor (e.g., 0.25) (1 for no downsampling)
-blk_size = 1000; % number of frames that are read together
 
 %% directories
 user= getenv('username');
@@ -63,57 +62,32 @@ img_size = vidH * vidW*(down_factor)^2;
 %% Calculate activity index by reading each frame (part or the whole video)
 endFrame = len; % no trimming
 % endFrame = 2000; % optional trimming if a speicfic endframe is put in here
-num_frmblk = floor(endFrame/blk_size);
 activity_index = zeros(endFrame-1,1);
 se = strel('square', 3); % this defines the neighbors
-if (num_frmblk > 0)
-    for ii = 1:num_frmblk % should be until endFrame
-        video = read(v, [(ii-1)*blk_size+1 ii*blk_size]);
-        for k = 1:blk_size-1
-             video1 = video(:,:, 1, k); 
-            % video1 =imresize(video1, down_factor, 'nearest'); % downsample 
-            % figure; imshow(video1);
-            video1 = imgaussfilt(video1, sigma); % the default sigma, 0.5
-            video2 = video(:, :, 1, k+1); 
-            % video2 =imresize(video2, down_factor, 'nearest'); % downsample 
-            video2 = imgaussfilt(video2, sigma); % the default sigma, 0.5
-            diff =  video1 - video2;
-            activity = abs(diff) > activity_thr;
-            activity = imerode(activity,se);   
-            activity = imdilate(activity, se);  
-            activity_count =  find(activity==1);
-            if isempty(activity_count)==1
-                activity_index((ii-1)*blk_size+k) = 0;
-            else
-                activity_index ((ii-1)*blk_size+k) = length(activity_count);
-            end   
-        end
-    end
-end
-
-% read the last frame block
-frame_partial = endFrame - num_frmblk*blk_size;
-if frame_partial > 0
-    video = read(v, [num_frmblk*blk_size+1 num_frmblk*blk_size+frame_partial]);
-    for k = 1:frame_partial-1
-        video1 = video(:,:, 1, k); 
-        % video1 =imresize(video1, down_factor, 'nearest'); % downsample 
-        video1 = imgaussfilt(video1, sigma); % the default sigma, 0.5
-        video2 = video(:, :, 1, k+1); 
-        % video2 =imresize(video2, down_factor, 'nearest'); % downsample 
-        video2 = imgaussfilt(video2, sigma); % the default sigma, 0.5
-        diff =  video1 - video2;
+v.CurrentTime = 0; % initiate the video
+clear frame_prev
+k = 1;
+activity_prev = false(960,1280); % initialize for the second frame.
+while hasFrame(v)
+    frame_cur = readFrame(v);
+    frame_cur=  0.2989 * frame_cur(:,:, 1) + 0.5870 * frame_cur(:,:, 2) + 0.1140 * frame_cur(:,:, 3); 
+    frame_cur = imgaussfilt(frame_cur, sigma);
+    if k > 1
+        diff = frame_cur-frame_prev;
         activity = abs(diff) > activity_thr;
-        activity = imerode(activity,se);   % erosion step %% add very little additional time
-        activity = imdilate(activity, se);  % dilation step
-        activity_count =  find(activity==1);
+        activity = imerode(activity,se);   
+        activity = imdilate(activity, se); 
+        activity_count =  find(activity==1); 
         if isempty(activity_count)==1
-            activity_index(num_frmblk*blk_size+k) = 0;
+            activity_index(k-1) = 0;
         else
-            activity_index (num_frmblk*blk_size+k) = length(activity_count);
-        end   
-    end
+            activity_index (k-1) = length(activity_count);
+        end 
+    end   
+    frame_prev = frame_cur;
+    k = k+1;
 end
+    
 % normalize the activity_index to the image size and scale
 activity_index = activity_index/img_size*100*2; 
 
