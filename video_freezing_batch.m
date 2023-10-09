@@ -113,29 +113,35 @@ vidW = v.Width;
 
 %% Calculate motion index by reading each frame (part or the whole video)
 endFrame = len-1; % optional trimming if a speicfic endframe is put in here.
-motion_index = zeros(len-1,1);
+motion_index = zeros(endFrame,1);
 se = strel('square', 3); % this defines the neighbors
 
-for k = 1:endFrame % should be until endFrame
-    video1 = read(v, k); video1 = rgb2gray(video1); 
-    video1 = imgaussfilt(video1, sigma); % the default sigma, 0.5
-    video2 = read(v, k+1); video2 = rgb2gray(video2); 
-    video2 = imgaussfilt(video2, sigma); % the default sigma, 0.5
-    diff =  video1 - video2;
-    motion = abs(diff) > motion_thr;
-    % erosion and dilation 
-    motion = imerode(motion,se);   % erosion step
-    motion = imdilate(motion, se);  % dilation step
-    motion_count =  find(motion==1);
-    if isempty(motion_count)==1
-        motion_index(k) = 0;
-    else
-        motion_index (k) = length(motion_count);
+v.CurrentTime = 0; % initiate the video
+clear frame_prev
+k = 1;
+activity_prev = false(v.Height,v.Width); % initialize for the second frame.
+while hasFrame(v)
+    frame_cur = readFrame(v);
+    frame_cur=  0.2989 * frame_cur(:,:, 1) + 0.5870 * frame_cur(:,:, 2) + 0.1140 * frame_cur(:,:, 3); 
+    frame_cur = imgaussfilt(frame_cur, sigma);
+    if k > 1
+        diff = frame_cur-frame_prev;
+        motion = abs(diff) > motion_thr;
+        motion = imerode(motion,se);   
+        motion = imdilate(motion, se); 
+        motion_count =  find(motion==1); 
+        if isempty(motion_count)==1
+            motion_index(k-1) = 0;
+        else
+            motion_index (k-1) = length(motion_count);
+        end 
     end   
+    frame_prev = frame_cur;
+    k = k+1;
 end
 
 len = length(motion_index);
-time = 1/fs/2 : 1/fs :1/fs*(len-1) + 1/fs/2;
+time = 0 : 1/fs :1/fs*(len-1) ;
 H0 = figure; set(gcf,'position', [104 45 1400 600]);
 subplot(211); plot( motion_index,'k'); set(gca,'fontSize',12); xlim('tight');
 set(gca,'color','none','XColor','k','YColor','k','FontSize',16, 'GridLineStyle','none');box off; 
@@ -150,7 +156,7 @@ if strcmp(protocol,'delay_3ts') == 1 || strcmp(protocol,'trace_3ts')  == 1
     min(component{6,2}), max(component{6,2});
     min(component{9,2}), max(component{9,2})}; 
     for ii = 1:3
-        x1 = [col_2{ii,1},col_2{ii,2},col_2{ii,2},col_2{ii,1}];
+        x1 = [col_2{ii,1}-1/fs,col_2{ii,2}-1/fs,col_2{ii,2}-1/fs,col_2{ii,1}-1/fs];
         x2 = [col_1{ii,1},col_1{ii,2},col_1{ii,2},col_1{ii,1}];
         y2 = [0, 0, max(motion_index)*1.1, max(motion_index)*1.1];
         patch(x2, y2, 'm', 'FaceAlpha',.2, 'edgecolor', 'none');
