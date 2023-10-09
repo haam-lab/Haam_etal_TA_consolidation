@@ -157,7 +157,7 @@ if strcmp(protocol,'delay_3ts') == 1 || strcmp(protocol,'trace_3ts')  == 1
     min(component{9,2}), max(component{9,2})}; 
     for ii = 1:3
         x1 = [col_2{ii,1}-1/fs,col_2{ii,2}-1/fs,col_2{ii,2}-1/fs,col_2{ii,1}-1/fs];
-        x2 = [col_1{ii,1},col_1{ii,2},col_1{ii,2},col_1{ii,1}];
+        x2 = [col_1{ii,1}-1/fs,col_1{ii,2}-1/fs,col_1{ii,2}-1/fs,col_1{ii,1}-1/fs];
         y2 = [0, 0, max(motion_index)*1.1, max(motion_index)*1.1];
         patch(x2, y2, 'm', 'FaceAlpha',.2, 'edgecolor', 'none');
         patch(x1, y2, 'g', 'FaceAlpha',.4, 'edgecolor', 'none');
