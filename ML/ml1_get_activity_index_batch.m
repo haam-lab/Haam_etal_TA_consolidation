@@ -59,8 +59,11 @@ vidW = v.Width;
 %% Calculate activity index by reading each frame (part or the whole video)
 % Set an ROI for video analysis
 roiPos = round([186.0847 246.0370 855.3699 468.1623]); % default
+frame = 10; % Default frame number for ROI
+figure; video1= read(v, frame);
+imshow(video1);
+rectangle('position', roiPos); % show the ROI 
 % (OPTIONAL) Draw a rectangle to designate a new ROI for analysis
-% frame = 10; % Default frame number for ROI
 % figure; video1= read(v, frame);
 % imshow(video1);
 % roi = drawrectangle;
